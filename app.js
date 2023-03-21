@@ -35,13 +35,13 @@ const authenticationToken = async (request, response, next) => {
     jwtToken = authHeader.split(" ")[1];
   }
   if (jwtToken === undefined) {
-    request.status(401);
-    request.send("Invalid JWT Token");
+    response.status(401);
+    response.send("Invalid JWT Token");
   } else {
     jwt.verify(jwtToken, "kapilkumar", async (error, payload) => {
       if (error) {
-        request.status(401);
-        request.send("Invalid JWT Token");
+        response.status(401);
+        response.send("Invalid JWT Token");
       } else {
         next();
       }
