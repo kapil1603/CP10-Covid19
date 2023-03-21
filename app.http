@@ -1,7 +1,74 @@
-GET http://localhost:3000/login/
-Content-Type: application/json
+POST http://localhost:3000/login/
+# Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
 
 {
   "username": "christopher_phillips",
   "password": "christy@123"
 }
+
+###
+//a list of all states in the state table
+GET http://localhost:3000/states/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+###
+//  state based on the state ID
+GET http://localhost:3000/states/2/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+###
+// a district list        // error: Cannot GET /districts/
+GET http://localhost:3000/districts/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+
+###
+// a district based on the district ID
+GET http://localhost:3000/districts/2/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+###
+# // Create a district in the district table
+POST http://localhost:3000/districts/
+# Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+{
+  "districtName": "Bagalkot",
+  "stateId": 3,
+  "cases": 2323,
+  "cured": 2000,
+  "active": 315,
+  "deaths": 8
+}
+
+###
+// Updates the details of a specific district
+PUT http://localhost:3000/districts/2/
+# Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+{
+  "districtName": "Nadia",
+  "stateId": 3,
+  "cases": 9628,
+  "cured": 6524,
+  "active": 3000,
+  "deaths": 104
+}
+
+###
+//Deletes a district 
+DELETE http://localhost:3000/districts/3/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+###
+//the statistics of total
+GET http://localhost:3000/states/2/stats/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+
+###
+// an object containing the state name of a district based on the district ID
+GET http://localhost:3000/districts/2/details/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U

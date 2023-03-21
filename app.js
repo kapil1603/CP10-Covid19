@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const app = express();
 app.use(express.json());
 
-const dbPath = path.join(__dirname, "covid19India.db");
+const dbPath = path.join(__dirname, "covid19IndiaPortal.db");
 
 let db = null;
 
@@ -28,6 +28,27 @@ const initializeDBAndServer = async () => {
 };
 initializeDBAndServer();
 
+const authenticationToken = async (request, response, next) => {
+  let jwtToken;
+  const authHeader = request.headers["authorization"];
+  if (authHeader !== undefined) {
+    jwtToken = authHeader.split(" ")[1];
+  }
+  if (jwtToken === undefined) {
+    request.status(401);
+    request.send("Invalid JWT Token");
+  } else {
+    jwt.verify(jwtToken, "kapilkumar", async (error, payload) => {
+      if (error) {
+        request.status(401);
+        request.send("Invalid JWT Token");
+      } else {
+        next();
+      }
+    });
+  }
+};
+
 // a list of all states in the state table
 
 const convertDbObjectToResponseObject = (dbObject) => {
@@ -38,7 +59,7 @@ const convertDbObjectToResponseObject = (dbObject) => {
   };
 };
 
-app.get("/states/", async (request, response) => {
+app.get("/states/", authenticationToken, async (request, response) => {
   const getPlayersQuery = `
     SELECT
       *
@@ -52,7 +73,7 @@ app.get("/states/", async (request, response) => {
 });
 
 //  state based on the state ID
-app.get("/states/:stateId/", async (request, response) => {
+app.get("/states/:stateId/", authenticationToken, async (request, response) => {
   const { stateId } = request.params;
   const getPlayerQuery = `
     SELECT
@@ -78,6 +99,25 @@ const convertDbObjectToResponseObjectDistrict = (dbObject) => {
     deaths: dbObject.deaths,
   };
 };
+
+app.get(
+  "/districts/:districtId/",
+  authenticationToken,
+  async (request, response) => {
+    const { districtId } = request.params;
+    const getDistrictIdQuery = `
+    SELECT
+      *
+    FROM
+      district
+    WHERE
+      district_id = ${districtId};`;
+    const myDistrict = await db.get(getDistrictIdQuery);
+    //   response.send(myState);
+    response.send(convertDbObjectToResponseObjectDistrict(myDistrict));
+  }
+);
+
 // register user
 app.post("/users/", async (request, response) => {
   const { username, password } = request.body;
@@ -113,12 +153,15 @@ app.post("/login/", async (request, response) => {
   console.log(dbUser);
   if (dbUser === undefined) {
     response.status(400);
-    response.send("Invalid User");
+    response.send("Invalid user");
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
     if (isPasswordMatched === true) {
-      response.status(200);
-      response.send("Login User");
+      const payload = { username: username };
+      const jwtToken = jwt.sign(payload, "kapilkumar");
+      response.send({ jwtToken });
+      //   response.status(200);
+      //   response.send("Login User");
     } else {
       response.status(400);
       response.send("Invalid password");
@@ -126,22 +169,8 @@ app.post("/login/", async (request, response) => {
   }
 });
 
-app.get("/districts/:districtId/", async (request, response) => {
-  const { districtId } = request.params;
-  const getDistrictIdQuery = `
-    SELECT
-      *
-    FROM
-      district
-    WHERE
-      district_id = ${districtId};`;
-  const myDistrict = await db.get(getDistrictIdQuery);
-  //   response.send(myState);
-  response.send(convertDbObjectToResponseObjectDistrict(myDistrict));
-});
-
 // Create a district in the district table
-app.post("/districts/", async (request, response) => {
+app.post("/districts/", authenticationToken, async (request, response) => {
   const { districtName, stateId, cases, cured, active, deaths } = request.body;
   const postDistrictQuery = `
   INSERT INTO
@@ -153,10 +182,20 @@ app.post("/districts/", async (request, response) => {
 });
 
 // Updates the details of a specific district
-app.put("/districts/:districtId/", async (request, response) => {
-  const { districtName, stateId, cases, cured, active, deaths } = request.body;
-  const { districtId } = request.params;
-  const updateDistrictQuery = `
+app.put(
+  "/districts/:districtId/",
+  authenticationToken,
+  async (request, response) => {
+    const {
+      districtName,
+      stateId,
+      cases,
+      cured,
+      active,
+      deaths,
+    } = request.body;
+    const { districtId } = request.params;
+    const updateDistrictQuery = `
   UPDATE
     district
   SET
@@ -169,60 +208,73 @@ app.put("/districts/:districtId/", async (request, response) => {
   WHERE
     district_id = ${districtId};`;
 
-  await db.run(updateDistrictQuery);
-  response.send("District Details Updated");
-});
+    await db.run(updateDistrictQuery);
+    response.send("District Details Updated");
+  }
+);
 
 // Deletes a district
-app.delete("/districts/:districtId/", async (request, response) => {
-  const { districtId } = request.params;
-  const deleteDistrictQuery = `
+app.delete(
+  "/districts/:districtId/",
+  authenticationToken,
+  async (request, response) => {
+    const { districtId } = request.params;
+    const deleteDistrictQuery = `
   DELETE FROM
     district
   WHERE
     district_id = ${districtId};`;
-  await db.run(deleteDistrictQuery);
-  response.send("District Removed");
-});
+    await db.run(deleteDistrictQuery);
+    response.send("District Removed");
+  }
+);
 
 // the statistics of total cases, cured, active, deaths;
-app.get("/states/:stateId/stats/", async (request, response) => {
-  const { stateId } = request.params;
-  const getStateStatsQuery = `
+app.get(
+  "/states/:stateId/stats/",
+  authenticationToken,
+  async (request, response) => {
+    const { stateId } = request.params;
+    const getStateStatsQuery = `
         SELECT SUM(cases),
                 SUM(cured),
                 SUM(active),
                 SUM(deaths)
         FROM district
         WHERE state_id = ${stateId} `;
-  const myStateStats = await db.get(getStateStatsQuery);
-  //   console.log(myStateStats);
+    const myStateStats = await db.get(getStateStatsQuery);
+    //   console.log(myStateStats);
 
-  response.send({
-    totalCases: myStateStats["SUM(cases)"],
-    totalCured: myStateStats["SUM(cured)"],
-    totalActive: myStateStats["SUM(active)"],
-    totalDeaths: myStateStats["SUM(deaths)"],
-  });
-});
+    response.send({
+      totalCases: myStateStats["SUM(cases)"],
+      totalCured: myStateStats["SUM(cured)"],
+      totalActive: myStateStats["SUM(active)"],
+      totalDeaths: myStateStats["SUM(deaths)"],
+    });
+  }
+);
 
 //an object containing the state name of a district based on the district ID
 //explanation : Using districtId we will get the state_id , and then
 //               using the state_id we will get the state_name .
-app.get("/districts/:districtId/details/", async (request, response) => {
-  const { districtId } = request.params;
-  const getDistrictIdQuery = `
+app.get(
+  "/districts/:districtId/details/",
+  authenticationToken,
+  async (request, response) => {
+    const { districtId } = request.params;
+    const getDistrictIdQuery = `
         SELECT state_id FROM district
         WHERE district_id = ${districtId} `;
-  const myDistrictId = await db.get(getDistrictIdQuery);
-  console.log(myDistrictId);
+    const myDistrictId = await db.get(getDistrictIdQuery);
+    console.log(myDistrictId);
 
-  const getStateNameQuery = `
+    const getStateNameQuery = `
   SELECT state_name as stateName FROM state
   WHERE state_id = ${myDistrictId.state_id}`;
-  const myStateName = await db.get(getStateNameQuery);
-  //   console.log(myStateName);
-  response.send(myStateName);
-});
+    const myStateName = await db.get(getStateNameQuery);
+    //   console.log(myStateName);
+    response.send(myStateName);
+  }
+);
 
 module.exports = app;
