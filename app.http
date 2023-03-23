@@ -1,6 +1,7 @@
 POST http://localhost:3000/login/
-# Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
+Content-Type: application/json
+# For API1 network call, there is no need to add the Authorization .
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
 
 {
   "username": "christopher_phillips",
@@ -31,9 +32,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoc
 ###
 # // Create a district in the district table
 POST http://localhost:3000/districts/
-# Content-Type: application/json
+Content-Type: application/json    
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
-
+# I observed that In the .http file, for some network calls, you have commented on the Content-Type which is the wrong approach.
+# we does not need to comment out Content-Type
 {
   "districtName": "Bagalkot",
   "stateId": 3,
@@ -46,7 +48,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoc
 ###
 // Updates the details of a specific district
 PUT http://localhost:3000/districts/2/
-# Content-Type: application/json
+Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNocmlzdG9waGVyX3BoaWxsaXBzIiwiaWF0IjoxNjc5MzcwMTA0fQ.hdYkXESQFv4LNYS1-FqOCFzD5d3DkmG7VarBz72sJ3U
 
 {
